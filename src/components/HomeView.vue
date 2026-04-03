@@ -8,14 +8,14 @@ const scoreStore = useScoreStore()
 const games: GameInfo[] = [
   {
     id: 'tetris',
-    name: 'Tetris',
-    description: 'Classic block-stacking puzzle game. Stack the falling tetrominos and clear lines!',
+    name: '俄罗斯方块',
+    description: '经典的方块堆叠益智游戏。移动和旋转下落的方块，填满一行即可消除。',
     color: '#9b59b6',
   },
   {
     id: 'snake',
-    name: 'Snake',
-    description: 'Grow your snake by eating food, but avoid hitting the walls or yourself!',
+    name: '贪吃蛇',
+    description: '经典的贪吃蛇游戏。控制蛇的方向，吃掉食物增长蛇身，不要撞到墙壁或自己的身体。',
     color: '#2ecc71',
   },
 ]
@@ -25,7 +25,7 @@ const games: GameInfo[] = [
   <div class="home">
     <header class="header">
       <h1 class="title">T Game</h1>
-      <p class="subtitle">Mini-Game Collection</p>
+      <p class="subtitle">迷你游戏合集</p>
     </header>
 
     <main class="game-list">
@@ -38,7 +38,7 @@ const games: GameInfo[] = [
     </main>
 
     <footer class="footer">
-      <p>Use arrow keys or WASD to play. Press P or Esc to pause.</p>
+      <p>使用方向键或 WASD 操作，P 或 Esc 暂停</p>
     </footer>
   </div>
 </template>

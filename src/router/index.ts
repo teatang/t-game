@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../components/HomeView.vue'
-import GameView from '../components/GameView.vue'
+import TetrisView from '../components/TetrisView.vue'
+import SnakeView from '../components/SnakeView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,10 +12,14 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/play/:gameId',
-      name: 'game',
-      component: GameView,
-      props: true,
+      path: '/play/tetris',
+      name: 'tetris',
+      component: TetrisView,
+    },
+    {
+      path: '/play/snake',
+      name: 'snake',
+      component: SnakeView,
     },
   ],
 })

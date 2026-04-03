@@ -13,6 +13,7 @@ export class TetrisGame implements IGame {
   private app: Application | null = null
   private board: TetrisBoard
   private currentPiece: TetrisPiece | null = null
+  private nextPiece: TetrisPiece | null = null
   private renderer: TetrisRenderer | null = null
   private ticker: (() => void) | null = null
   private lastDrop: number = 0
@@ -49,6 +50,7 @@ export class TetrisGame implements IGame {
     this.level = 1
     this.dropInterval = INITIAL_SPEED
     this.isPaused = false
+    this.nextPiece = TetrisPiece.randomPiece()
     this.spawnPiece()
 
     this.ticker = () => this.update()
@@ -84,9 +86,14 @@ export class TetrisGame implements IGame {
     this.app = app
   }
 
+  getNextPiece(): TetrisPiece | null {
+    return this.nextPiece
+  }
+
   private spawnPiece(): void {
-    this.currentPiece = TetrisPiece.randomPiece()
-    if (!this.board.isValidPosition(this.currentPiece)) {
+    this.currentPiece = this.nextPiece
+    this.nextPiece = TetrisPiece.randomPiece()
+    if (!this.currentPiece || !this.board.isValidPosition(this.currentPiece)) {
       this.gameOver()
     }
   }

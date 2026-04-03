@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, type Router } from 'vue-router'
 import type { GameInfo } from '../types/game'
 
 const props = defineProps<{
@@ -7,10 +7,18 @@ const props = defineProps<{
   highScore: number
 }>()
 
-const router = useRouter()
+const router: Router = useRouter()
+
+const routeNames: Record<string, string> = {
+  tetris: 'tetris',
+  snake: 'snake',
+}
 
 function play() {
-  router.push({ name: 'game', params: { gameId: props.game.id } })
+  const routeName = routeNames[props.game.id]
+  if (routeName) {
+    router.push({ name: routeName })
+  }
 }
 </script>
 
@@ -43,12 +51,12 @@ function play() {
     <p class="card-description">{{ game.description }}</p>
 
     <div class="card-score">
-      <span class="score-label">High Score</span>
+      <span class="score-label">最高分</span>
       <span class="score-value">{{ highScore.toLocaleString() }}</span>
     </div>
 
     <button class="play-button" @click="play">
-      Play Now
+      开始游戏
     </button>
   </div>
 </template>

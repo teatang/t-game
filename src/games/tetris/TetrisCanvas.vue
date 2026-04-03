@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Application, Container } from 'pixi.js'
+import { Application, Container, Graphics } from 'pixi.js'
 import { TetrisGame } from './TetrisGame'
+import { TetrisPiece } from './TetrisPiece'
 import { BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE } from './tetrisConfig'
 import { useScoreStore } from '../../stores/scoreStore'
 
@@ -12,12 +13,46 @@ const emit = defineEmits<{
 
 const scoreStore = useScoreStore()
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const nextCanvasRef = ref<HTMLCanvasElement | null>(null)
 const game = ref<TetrisGame | null>(null)
 const app = ref<Application | null>(null)
 const gameContainer = new Container()
+const nextGraphics = new Graphics()
 
 const CANVAS_WIDTH = BOARD_WIDTH * CELL_SIZE
 const CANVAS_HEIGHT = BOARD_HEIGHT * CELL_SIZE
+const NEXT_CELL_SIZE = 20
+const NEXT_SIZE = 4 * NEXT_CELL_SIZE
+
+function drawNextPiece(piece: TetrisPiece | null) {
+  nextGraphics.clear()
+  if (!piece) return
+
+  const shape = piece.getShape()
+  const offsetX = (NEXT_SIZE - shape[0].length * NEXT_CELL_SIZE) / 2
+  const offsetY = (NEXT_SIZE - shape.length * NEXT_CELL_SIZE) / 2
+
+  for (let y = 0; y < shape.length; y++) {
+    for (let x = 0; x < shape[y].length; x++) {
+      if (shape[y][x]) {
+        const cellX = offsetX + x * NEXT_CELL_SIZE
+        const cellY = offsetY + y * NEXT_CELL_SIZE
+        const padding = 1
+
+        nextGraphics
+          .roundRect(
+            cellX + padding,
+            cellY + padding,
+            NEXT_CELL_SIZE - padding * 2,
+            NEXT_CELL_SIZE - padding * 2,
+            3
+          )
+          .fill({ color: piece.color })
+          .stroke({ width: 1, color: 0xffffff, alpha: 0.3 })
+      }
+    }
+  }
+}
 
 function handleKeyDown(e: KeyboardEvent) {
   if (!game.value) return
@@ -43,11 +78,24 @@ function handleKeyDown(e: KeyboardEvent) {
       e.preventDefault()
       game.value.hardDrop()
       break
+    case 'p':
+    case 'escape':
+      if (game.value.isPausedState()) {
+        game.value.resume()
+      } else {
+        game.value.pause()
+      }
+      break
+  }
+
+  if (game.value) {
+    const nextPiece = game.value.getNextPiece()
+    drawNextPiece(nextPiece)
   }
 }
 
 onMounted(async () => {
-  if (!canvasRef.value) return
+  if (!canvasRef.value || !nextCanvasRef.value) return
 
   const application = new Application()
   await application.init({
@@ -70,6 +118,16 @@ onMounted(async () => {
     gameContainer.addChild(renderer.getGraphics())
   }
 
+  const nextApp = new Application()
+  await nextApp.init({
+    canvas: nextCanvasRef.value,
+    width: NEXT_SIZE,
+    height: NEXT_SIZE,
+    backgroundColor: 0x1a1a2e,
+    antialias: true,
+  })
+  nextApp.stage.addChild(nextGraphics)
+
   game.value.setCallbacks(
     (score, lines, level) => emit('scoreUpdate', score, lines, level),
     (score) => {
@@ -79,6 +137,9 @@ onMounted(async () => {
   )
 
   window.addEventListener('keydown', handleKeyDown)
+
+  const nextPiece = game.value.getNextPiece()
+  drawNextPiece(nextPiece)
 })
 
 onUnmounted(() => {
@@ -120,15 +181,37 @@ defineExpose({ startGame, pauseGame, stopGame })
 
 <template>
   <div class="tetris-canvas">
+    <div class="next-piece">
+      <span class="next-label">下一个</span>
+      <canvas ref="nextCanvasRef" :width="NEXT_SIZE" :height="NEXT_SIZE" />
+    </div>
     <canvas ref="canvasRef" :width="CANVAS_WIDTH" :height="CANVAS_HEIGHT" />
   </div>
 </template>
 
 <style scoped>
 .tetris-canvas {
-  display: inline-block;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
 }
+
+.next-piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.next-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 canvas {
   display: block;
+  border-radius: 8px;
 }
 </style>
