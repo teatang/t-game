@@ -1,0 +1,33 @@
+export const TETRIS_CONFIG = {
+  BOARD_WIDTH: 10,
+  BOARD_HEIGHT: 20,
+  CELL_SIZE: 30,
+  COLORS: {
+    I: 0x00f5ff,
+    O: 0xffd700,
+    T: 0x9b59b6,
+    S: 0x2ecc71,
+    Z: 0xe74c3c,
+    J: 0x3498db,
+    L: 0xe67e22,
+    EMPTY: 0x1a1a2e,
+    GRID: 0x2a2a4a,
+    GHOST: 0xffffff,
+  },
+  INITIAL_SPEED: 1000,
+  SPEED_INCREMENT: 50,
+  LINES_PER_LEVEL: 10,
+  SCORING: {
+    1: 100,
+    2: 300,
+    3: 500,
+    4: 800,
+  },
+}
+
+export const BOARD_WIDTH = TETRIS_CONFIG.BOARD_WIDTH
+export const BOARD_HEIGHT = TETRIS_CONFIG.BOARD_HEIGHT
+export const CELL_SIZE = TETRIS_CONFIG.CELL_SIZE
+export const INITIAL_SPEED = TETRIS_CONFIG.INITIAL_SPEED
+export const SPEED_INCREMENT = TETRIS_CONFIG.SPEED_INCREMENT
+export const LINES_PER_LEVEL = TETRIS_CONFIG.LINES_PER_LEVEL
