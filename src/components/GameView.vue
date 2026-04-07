@@ -10,10 +10,12 @@ const route = useRoute()
 const router = useRouter()
 const scoreStore = useScoreStore()
 
+// 从路由参数获取游戏 ID
 const gameId = computed(() => route.params.gameId as GameType)
 const tetrisRef = ref<InstanceType<typeof TetrisCanvas> | null>(null)
 const snakeRef = ref<InstanceType<typeof SnakeCanvas> | null>(null)
 
+// 游戏状态
 const currentScore = ref(0)
 const lines = ref(0)
 const level = ref(1)
@@ -23,8 +25,10 @@ const showOverlay = ref(true)
 const isPaused = ref(false)
 const gameStarted = ref(false)
 
+// 根据游戏 ID 获取最高分
 const highScore = computed(() => scoreStore.getHighScore(gameId.value))
 
+// 游戏信息（名称、颜色）
 const gameInfo = computed(() => {
   if (gameId.value === 'tetris') {
     return { name: 'Tetris', color: '#9b59b6' }
@@ -34,6 +38,12 @@ const gameInfo = computed(() => {
   return { name: 'Unknown', color: '#fff' }
 })
 
+/**
+ * 处理分数更新
+ * @param score - 当前分数
+ * @param _extra1 - 额外参数（俄罗斯方块为行数，贪吃蛇为速度）
+ * @param _extra2 - 额外参数（俄罗斯方块为等级）
+ */
 function handleScoreUpdate(score: number, _extra1?: number, _extra2?: number) {
   currentScore.value = score
   if (gameId.value === 'tetris') {
@@ -44,12 +54,18 @@ function handleScoreUpdate(score: number, _extra1?: number, _extra2?: number) {
   }
 }
 
+/**
+ * 处理游戏结束
+ */
 function handleGameOver(score: number) {
   currentScore.value = score
   isGameOver.value = true
   showOverlay.value = true
 }
 
+/**
+ * 开始游戏
+ */
 function startGame() {
   if (gameId.value === 'tetris' && tetrisRef.value) {
     tetrisRef.value.startGame()
@@ -66,6 +82,9 @@ function startGame() {
   speed.value = 0
 }
 
+/**
+ * 切换暂停状态
+ */
 function togglePause() {
   if (!gameStarted.value || isGameOver.value) return
 
@@ -78,6 +97,9 @@ function togglePause() {
   showOverlay.value = isPaused.value
 }
 
+/**
+ * 返回主页
+ */
 function goHome() {
   if (gameId.value === 'tetris' && tetrisRef.value) {
     tetrisRef.value.stopGame()
@@ -87,6 +109,9 @@ function goHome() {
   router.push({ name: 'home' })
 }
 
+/**
+ * 键盘事件处理
+ */
 function handleKeyDown(e: KeyboardEvent) {
   if (e.key.toLowerCase() === 'p' || e.key.toLowerCase() === 'escape') {
     if (!gameStarted.value) {
@@ -97,6 +122,7 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
+// 监听游戏 ID 变化，重置状态
 watch(gameId, () => {
   gameStarted.value = false
   isGameOver.value = false
@@ -144,6 +170,7 @@ onUnmounted(() => {
           @game-over="handleGameOver"
         />
 
+        <!-- 开始/暂停遮罩 -->
         <div v-if="showOverlay && !isGameOver" class="overlay">
           <div class="overlay-content">
             <h2>{{ isPaused ? 'Paused' : 'Get Ready!' }}</h2>
@@ -156,6 +183,7 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!-- 游戏结束遮罩 -->
         <div v-if="isGameOver" class="overlay">
           <div class="overlay-content">
             <h2>Game Over!</h2>
@@ -175,6 +203,7 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- 分数面板 -->
       <aside class="scoreboard">
         <div class="score-item">
           <span class="score-label">Score</span>

@@ -8,26 +8,43 @@ const router = useRouter()
 const scoreStore = useScoreStore()
 const tetrisRef = ref<InstanceType<typeof TetrisCanvas> | null>(null)
 
+// 当前分数
 const currentScore = ref(0)
-const lines = ref(0)
-const level = ref(1)
+// 俄罗斯方块最高分
 const highScore = computed(() => scoreStore.getHighScore('tetris'))
+// 是否显示遮罩层
 const showOverlay = ref(true)
+// 是否暂停
 const isPaused = ref(false)
+// 是否游戏结束
 const isGameOver = ref(false)
 
+/**
+ * 处理分数更新
+ */
 function handleScoreUpdate(score: number, clearedLines: number, gameLevel: number) {
   currentScore.value = score
   lines.value = clearedLines
   level.value = gameLevel
 }
 
+// 消除的行数
+const lines = ref(0)
+// 当前等级
+const level = ref(1)
+
+/**
+ * 处理游戏结束
+ */
 function handleGameOver(score: number) {
   isGameOver.value = true
   showOverlay.value = true
   scoreStore.updateScore('tetris', score)
 }
 
+/**
+ * 开始游戏
+ */
 function startGame() {
   tetrisRef.value?.startGame()
   showOverlay.value = false
@@ -38,17 +55,27 @@ function startGame() {
   level.value = 1
 }
 
+/**
+ * 切换暂停状态
+ */
 function togglePause() {
   tetrisRef.value?.pauseGame()
   isPaused.value = !isPaused.value
   showOverlay.value = isPaused.value
 }
 
+/**
+ * 返回主页
+ */
 function goHome() {
   tetrisRef.value?.stopGame()
   router.push({ name: 'home' })
 }
 
+/**
+ * 键盘事件处理
+ * P/Esc 键：暂停或开始
+ */
 function handleKeyDown(e: KeyboardEvent) {
   if (e.key.toLowerCase() === 'p' || e.key.toLowerCase() === 'escape') {
     if (showOverlay.value && !isGameOver.value) {
@@ -81,6 +108,7 @@ function handleKeyDown(e: KeyboardEvent) {
           @game-over="handleGameOver"
         />
 
+        <!-- 开始/暂停遮罩 -->
         <div v-if="showOverlay && !isGameOver" class="overlay">
           <div class="overlay-content">
             <h2>准备开始!</h2>
@@ -90,6 +118,7 @@ function handleKeyDown(e: KeyboardEvent) {
           </div>
         </div>
 
+        <!-- 游戏结束遮罩 -->
         <div v-if="isGameOver" class="overlay">
           <div class="overlay-content">
             <h2>游戏结束!</h2>
@@ -109,6 +138,7 @@ function handleKeyDown(e: KeyboardEvent) {
         </div>
       </div>
 
+      <!-- 分数面板 -->
       <aside class="scoreboard">
         <div class="score-item">
           <span class="score-label">得分</span>
@@ -129,6 +159,7 @@ function handleKeyDown(e: KeyboardEvent) {
       </aside>
     </main>
 
+    <!-- 操作说明 -->
     <footer class="controls-guide">
       <h3>操作说明</h3>
       <div class="controls-grid">

@@ -5,6 +5,7 @@ import type { GameInfo } from '../types/game'
 
 const scoreStore = useScoreStore()
 
+// 游戏列表数据
 const games: GameInfo[] = [
   {
     id: 'tetris',

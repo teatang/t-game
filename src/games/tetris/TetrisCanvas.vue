@@ -19,16 +19,23 @@ const app = ref<Application | null>(null)
 const gameContainer = new Container()
 const nextGraphics = new Graphics()
 
+// 画布尺寸
 const CANVAS_WIDTH = BOARD_WIDTH * CELL_SIZE
 const CANVAS_HEIGHT = BOARD_HEIGHT * CELL_SIZE
+// 下一个方块预览的尺寸
 const NEXT_CELL_SIZE = 20
 const NEXT_SIZE = 4 * NEXT_CELL_SIZE
 
+/**
+ * 绘制下一个方块预览
+ * @param piece - 要绘制的方块，为 null 时清空画布
+ */
 function drawNextPiece(piece: TetrisPiece | null) {
   nextGraphics.clear()
   if (!piece) return
 
   const shape = piece.getShape()
+  // 居中显示
   const offsetX = (NEXT_SIZE - shape[0].length * NEXT_CELL_SIZE) / 2
   const offsetY = (NEXT_SIZE - shape.length * NEXT_CELL_SIZE) / 2
 
@@ -54,6 +61,10 @@ function drawNextPiece(piece: TetrisPiece | null) {
   }
 }
 
+/**
+ * 键盘事件处理
+ * 支持方向键和 WASD 控制
+ */
 function handleKeyDown(e: KeyboardEvent) {
   if (!game.value) return
 
@@ -88,6 +99,7 @@ function handleKeyDown(e: KeyboardEvent) {
       break
   }
 
+  // 更新下一个方块预览
   if (game.value) {
     const nextPiece = game.value.getNextPiece()
     drawNextPiece(nextPiece)
@@ -97,6 +109,7 @@ function handleKeyDown(e: KeyboardEvent) {
 onMounted(async () => {
   if (!canvasRef.value || !nextCanvasRef.value) return
 
+  // 初始化主游戏画布
   const application = new Application()
   await application.init({
     canvas: canvasRef.value,
@@ -113,11 +126,13 @@ onMounted(async () => {
   game.value.setApplication(application)
   game.value.init(canvasRef.value)
 
+  // 将游戏渲染器添加到舞台
   const renderer = (game.value as any).renderer
   if (renderer) {
     gameContainer.addChild(renderer.getGraphics())
   }
 
+  // 初始化下一个方块预览画布
   const nextApp = new Application()
   await nextApp.init({
     canvas: nextCanvasRef.value,
@@ -128,6 +143,7 @@ onMounted(async () => {
   })
   nextApp.stage.addChild(nextGraphics)
 
+  // 设置游戏回调
   game.value.setCallbacks(
     (score, lines, level) => emit('scoreUpdate', score, lines, level),
     (score) => {
@@ -138,6 +154,7 @@ onMounted(async () => {
 
   window.addEventListener('keydown', handleKeyDown)
 
+  // 绘制初始下一个方块预览
   const nextPiece = game.value.getNextPiece()
   drawNextPiece(nextPiece)
 })
@@ -154,12 +171,18 @@ onUnmounted(() => {
   }
 })
 
+/**
+ * 开始游戏
+ */
 function startGame() {
   if (game.value) {
     game.value.start()
   }
 }
 
+/**
+ * 切换暂停状态
+ */
 function pauseGame() {
   if (game.value) {
     if (game.value.isPausedState()) {
@@ -170,6 +193,9 @@ function pauseGame() {
   }
 }
 
+/**
+ * 停止游戏
+ */
 function stopGame() {
   if (game.value) {
     game.value.stop()
@@ -181,10 +207,12 @@ defineExpose({ startGame, pauseGame, stopGame })
 
 <template>
   <div class="tetris-canvas">
+    <!-- 下一个方块预览区域 -->
     <div class="next-piece">
       <span class="next-label">下一个</span>
       <canvas ref="nextCanvasRef" :width="NEXT_SIZE" :height="NEXT_SIZE" />
     </div>
+    <!-- 主游戏画布 -->
     <canvas ref="canvasRef" :width="CANVAS_WIDTH" :height="CANVAS_HEIGHT" />
   </div>
 </template>

@@ -9,11 +9,15 @@ const props = defineProps<{
 
 const router: Router = useRouter()
 
+// 路由名称映射
 const routeNames: Record<string, string> = {
   tetris: 'tetris',
   snake: 'snake',
 }
 
+/**
+ * 跳转到指定游戏的页面
+ */
 function play() {
   const routeName = routeNames[props.game.id]
   if (routeName) {
@@ -25,8 +29,10 @@ function play() {
 <template>
   <div class="card" :style="{ '--accent': game.color }">
     <div class="card-icon">
+      <!-- 游戏图标 SVG -->
       <svg viewBox="0 0 24 24" fill="currentColor">
         <template v-if="game.id === 'tetris'">
+          <!-- 俄罗斯方块图标 - 3x3 网格方块 -->
           <rect x="2" y="2" width="6" height="6" />
           <rect x="8" y="2" width="6" height="6" />
           <rect x="14" y="2" width="6" height="6" />
@@ -38,6 +44,7 @@ function play() {
           <rect x="14" y="14" width="6" height="6" />
         </template>
         <template v-else-if="game.id === 'snake'">
+          <!-- 贪吃蛇图标 - 蛇身圆点 -->
           <circle cx="6" cy="6" r="3" />
           <circle cx="12" cy="6" r="3" />
           <circle cx="18" cy="6" r="3" />
